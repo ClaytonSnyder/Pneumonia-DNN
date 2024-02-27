@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "pneumonia-dnn"
+version = "0.1.0"
+description = ""
+authors = ["Clayton Snyder <cms8896@psu.edu>", "Rick Singh <rjs7003@psu.edu>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "pneumonia_dnn"}]
+
+[tool.poetry.scripts]
+pdnn = "pneumonia_dnn.cli.main:app"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+typer = {extras = ["all"], version = "^0.9.0"}
+kaggle = "^1.6.6"
+pandas = "^2.2.1"
+pillow = "^10.2.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
