@@ -3,42 +3,30 @@ Preprocessor CLI
 """
 import typer
 
-from pneumonia_dnn.preprocessor import create_dataset, delete_datasets, download_datasets
+from pneumonia_dnn.preprocessor import delete_datasets, download_datasets
 
 app = typer.Typer()
 
 @app.command()
-def download(output_path: str = "datasets"):
+def download(datasets_path: str = "datasets"):
     """
-    Download Required Datasets
-    """
-    download_datasets(output_path)
-
-
-@app.command()
-def delete():
-    """
-    Delete existing datasets
-    """
-    delete_datasets()
-
-
-@app.command()
-def preprocess(name: str,
-                max_images: int = 100,
-                percent_training: float = 0.7,
-                percent_pneumonia: float = 0.5,
-                output_path: str = "datasets",
-                width: int = 512,
-                height: int = 512):
-    """
-    Preprocesses images and generates a random dataset of max images
+     Download Required Datasets
 
     Args:
-        max_images (int): _description_
+        datasets_path (str, optional): Path to downloaded datasets.
     """
-    create_dataset(name, max_images, percent_training,
-                   percent_pneumonia, output_path, width, height)
+    download_datasets(datasets_path)
+
+
+@app.command()
+def delete(datasets_path: str = "datasets"):
+    """
+    Delete existing datasets
+
+    Args:
+        datasets_path (str, optional): Path to downloaded datasets.
+    """
+    delete_datasets(datasets_path, True)
 
 if __name__ == "__main__":
     app()

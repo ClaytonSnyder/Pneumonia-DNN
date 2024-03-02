@@ -1,2 +1,5 @@
 kaggle.json
 datasets/
+projects/
+dist/
+**/__pycache__/

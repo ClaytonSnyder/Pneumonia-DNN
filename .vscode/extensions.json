@@ -1,0 +1,22 @@
+{
+    "recommendations": [
+      "DavidAnson.vscode-markdownlint",
+      "EditorConfig.EditorConfig",
+      "esbenp.prettier-vscode",
+      "formulahendry.code-runner",
+      "foxundermoon.shell-format",
+      "mads-hartmann.bash-ide-vscode",
+      "ms-python.black-formatter",
+      "ms-python.isort",
+      "ms-python.mypy-type-checker",
+      "ms-python.pylint",
+      "ms-python.python",
+      "ms-python.vscode-pylance",
+      "njpwerner.autodocstring",
+      "sourcery.sourcery",
+      "tamasfe.even-better-toml",
+      "timonwong.shellcheck",
+      "usernamehw.errorlens",
+      "VisualStudioExptTeam.vscodeintellicode"
+    ]
+  }
