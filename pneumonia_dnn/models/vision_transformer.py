@@ -2,19 +2,20 @@
 Vision Transformer Neural Network
 """
 
+from typing import Any
+
 import tensorflow as tf
 
-from keras import layers, models
+from einops.layers.tensorflow import Rearrange
+from keras import Model, layers
 from keras.optimizers import RMSprop
 from keras.preprocessing.image import ImageDataGenerator
-
-
-from einops.layers.tensorflow import Rearrange
 
 
 def __create_model(
     width: int,
     height: int,
+    channels: int,
     patch_size: int,
     num_layers,
     d_model,
@@ -22,7 +23,7 @@ def __create_model(
     mlp_dim,
     dropout_rate=0.1,
 ):
-    input_shape = (width, height)
+    input_shape = (width, height, channels)
 
     # Input
     inputs = layers.Input(shape=input_shape)
@@ -76,30 +77,49 @@ def __create_model(
     return model
 
 
-# Parameters
-input_shape = (224, 224, 3)  # Example shape for chest X-rays # Pneumonia or non-pneumonia
-patch_size = 16  # Size of patches
-num_layers = 6  # Number of transformer layers
-d_model = 256  # Model dimension
-num_heads = 8  # Number of attention heads
-mlp_dim = 512  # MLP hidden dimension
-dropout_rate = 0.1  # Dropout rate
-
-# Create the ViT model
-model = vision_transformer(
-    input_shape,
+def run_model(
+    projects_name: str,
+    projects_path: str,
+    width: int,
+    height: int,
+    channels: int,
     patch_size,
-    num_layers,
-    d_model,
-    num_heads,
-    mlp_dim,
-    dropout_rate,
-)
+    num_layers: int,
+    d_model: int,
+    num_heads: int,
+    mlp_dim: int,
+    dropout_rate: float,
+) -> Any:
+    train_data_path = f"{projects_path}/{projects_name}/dataset/train"
+    test_data_path = f"{projects_path}/{projects_name}/dataset/test"
 
-# Compile the model
-model.compile(
-    optimizer="adam", loss="sparse_categorical_crossentropy", metrics=["accuracy"]
-)
+    train_datagen = ImageDataGenerator(rescale=1.0 / 255)
 
-# Print model summary
-model.summary()
+    train_dataset = train_datagen.flow_from_directory(
+        train_data_path, target_size=(width, height), batch_size=32, class_mode="binary"
+    )
+
+    test_datagen = ImageDataGenerator(rescale=1.0 / 255)
+
+    test_dataset = test_datagen.flow_from_directory(
+        test_data_path, batch_size=10, class_mode="binary", target_size=(width, height)
+    )
+
+    model = __create_model(
+        width,
+        height,
+        channels,
+        patch_size,
+        num_layers,
+        d_model,
+        num_heads,
+        mlp_dim,
+        dropout_rate,
+    )
+    model.compile(
+        optimizer=RMSprop(lr=0.0001),
+        loss="binary_crossentropy",
+        metrics=["binary_accuracy"],
+    )
+
+    return model.fit(train_dataset, validation_data=test_dataset, epochs=25, verbose=1)

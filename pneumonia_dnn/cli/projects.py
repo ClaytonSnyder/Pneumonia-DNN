@@ -7,7 +7,8 @@ from typing import Optional
 import typer
 
 from pneumonia_dnn.image_manipulation import resize_images
-from pneumonia_dnn.models.cnn import run_model
+from pneumonia_dnn.models.cnn import run_model as run_cnn
+from pneumonia_dnn.models.vision_transformer import run_model as run_vit
 from pneumonia_dnn.preprocessor import create_project, delete_project
 
 
@@ -91,7 +92,7 @@ def cnn(  # pylint: disable=too-many-arguments
         height (int): Height to scale images to.
         projects_path (_type_, optional): Path where projects will be created.
     """
-    run_model(name, projects_path, width, height, 3)
+    run_cnn(name, projects_path, width, height, 3)
 
 
 @app.command()
@@ -100,7 +101,7 @@ def vit(  # pylint: disable=too-many-arguments
     width: int = 500,
     height: int = 500,
     projects_path: str = "projects",
-    patch_size=16,
+    patch_size=10,
     num_layers=6,
     d_model=256,
     num_heads=8,
@@ -116,7 +117,19 @@ def vit(  # pylint: disable=too-many-arguments
         height (int): Height to scale images to.
         projects_path (_type_, optional): Path where projects will be created.
     """
-    run_model(name, projects_path, width, height, 3)
+    run_vit(
+        name,
+        projects_path,
+        width,
+        height,
+        3,
+        patch_size,
+        num_layers,
+        d_model,
+        num_heads,
+        mlp_dim,
+        dropout_rate,
+    )
 
 
 if __name__ == "__main__":

@@ -58,9 +58,11 @@ def run_model(
         test_data_path, batch_size=10, class_mode="binary", target_size=(width, height)
     )
 
-    model = __create_model(width, height, 3)
+    model = __create_model(width, height, channels)
     model.compile(
         optimizer=RMSprop(lr=0.0001), loss="binary_crossentropy", metrics=["accuracy"]
     )
 
-    return model.fit(train_dataset, validation_data=test_dataset, epochs=25, verbose=1)
+    return model.fit(
+        train_dataset, validation_data=test_dataset, epochs=25, verbose=binary_accuracy
+    )
