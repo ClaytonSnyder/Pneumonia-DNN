@@ -94,5 +94,30 @@ def cnn(  # pylint: disable=too-many-arguments
     run_model(name, projects_path, width, height, 3)
 
 
+@app.command()
+def vit(  # pylint: disable=too-many-arguments
+    name: str,
+    width: int = 500,
+    height: int = 500,
+    projects_path: str = "projects",
+    patch_size=16,
+    num_layers=6,
+    d_model=256,
+    num_heads=8,
+    mlp_dim=512,
+    dropout_rate=0.1,
+):
+    """
+    Creates a project
+
+    Args:
+        name (str): Name of the project
+        width (int): Width to scale images to.
+        height (int): Height to scale images to.
+        projects_path (_type_, optional): Path where projects will be created.
+    """
+    run_model(name, projects_path, width, height, 3)
+
+
 if __name__ == "__main__":
     app()

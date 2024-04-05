@@ -1,10 +1,16 @@
 """
 Coronahack dataset processor
 """
+
 from typing import List
 import pandas as pd
 
-from pneumonia_dnn.dataset_processors.base_processor import DatasetProcessorBase, ImageLabel, ProcessedImage
+from pneumonia_dnn.dataset_processors.base_processor import (
+    DatasetProcessorBase,
+    ImageLabel,
+    ProcessedImage,
+)
+
 
 class CoronahackProcessor(DatasetProcessorBase):
     """
@@ -23,7 +29,7 @@ class CoronahackProcessor(DatasetProcessorBase):
 
     def get_output_path(self, base_output_path: str) -> str:
         """
-        Get the output path to where the dataset was saved 
+        Get the output path to where the dataset was saved
 
         Returns:
             str: Path to where the dataset was saved
@@ -39,12 +45,14 @@ class CoronahackProcessor(DatasetProcessorBase):
         """
         return "praveengovi/coronahack-chest-xraydataset"
 
-    def get_images(self,
-                base_output_path: str,
-                num_of_pneumonia_train: int, 
-                num_of_nonpneumonia_train: int,
-                num_of_pneumonia_test: int, 
-                num_of_nonpneumonia_test: int) -> List[ProcessedImage]:
+    def get_images(
+        self,
+        base_output_path: str,
+        num_of_pneumonia_train: int,
+        num_of_nonpneumonia_train: int,
+        num_of_pneumonia_test: int,
+        num_of_nonpneumonia_test: int,
+    ) -> List[ProcessedImage]:
         """
         Preprocess images
 
@@ -52,7 +60,7 @@ class CoronahackProcessor(DatasetProcessorBase):
             base_output_path (str): Base output path
             num_of_pneumonia_train (int): Total number of pneumonia images to
                                         pull from the dataset for trainining
-            num_of_nonpneumonia_train (int): Total number of non-pneumonia images to 
+            num_of_nonpneumonia_train (int): Total number of non-pneumonia images to
                                         pull from the dataset for training
             num_of_pneumonia_test (float): Total number of pneumonia images to
                                         pull from the dataset for testing
@@ -68,22 +76,32 @@ class CoronahackProcessor(DatasetProcessorBase):
         pneumonia_df = metadata_df[metadata_df["Label"] != "Normal"]
 
         processed_images = self.__get_processed_images(
-            pneumonia_df.sample(num_of_pneumonia_train),
-            True, output_path)
+            pneumonia_df.sample(num_of_pneumonia_train), True, output_path
+        )
         processed_images.extend(
-            self.__get_processed_images(normal_df.sample(num_of_nonpneumonia_train),
-            True, output_path))
+            self.__get_processed_images(
+                normal_df.sample(num_of_nonpneumonia_train), True, output_path
+            )
+        )
         processed_images.extend(
-            self.__get_processed_images(pneumonia_df.sample(num_of_pneumonia_test),
-            False, output_path))
+            self.__get_processed_images(
+                pneumonia_df.sample(num_of_pneumonia_test), False, output_path
+            )
+        )
         processed_images.extend(
-            self.__get_processed_images(normal_df.sample(num_of_nonpneumonia_test),
-            False, output_path))
+            self.__get_processed_images(
+                normal_df.sample(num_of_nonpneumonia_test), False, output_path
+            )
+        )
 
         return processed_images
 
-    def __get_processed_images(self, df: pd.DataFrame,
-                               is_training: bool, output_path: str) -> List[ProcessedImage]:
+    def get_observation_count(self) -> int:
+        return 5911
+
+    def __get_processed_images(
+        self, df: pd.DataFrame, is_training: bool, output_path: str
+    ) -> List[ProcessedImage]:
         df_list = df.values.tolist()
         result: List[ProcessedImage] = []
         for row in df_list:
@@ -95,9 +113,9 @@ class CoronahackProcessor(DatasetProcessorBase):
 
             if label_str in ("Normal", "normal"):
                 category = ImageLabel.NO_PNEUMONIA
-                has_pneumonia= False
+                has_pneumonia = False
             elif category_str in ("Virus", "virus"):
-                category =  ImageLabel.VIRAL_PNEUMONIA
+                category = ImageLabel.VIRAL_PNEUMONIA
             elif category_str in ("bacteria", "Bacteria"):
                 category = ImageLabel.BACTERIAL_PNEUMONIA
             else:
@@ -108,11 +126,17 @@ class CoronahackProcessor(DatasetProcessorBase):
             else:
                 sub_path = "test"
 
-            image_path = (f"{output_path}/Coronahack-Chest-XRay-Dataset"
-                        + f"/Coronahack-Chest-XRay-Dataset/{sub_path}/{file_name}")
+            image_path = (
+                f"{output_path}/Coronahack-Chest-XRay-Dataset"
+                + f"/Coronahack-Chest-XRay-Dataset/{sub_path}/{file_name}"
+            )
 
-            result.append(ProcessedImage(image_path=image_path,
-                                        has_pneumonia=has_pneumonia,
-                                        label=category,
-                                        is_training=is_training))
+            result.append(
+                ProcessedImage(
+                    image_path=image_path,
+                    has_pneumonia=has_pneumonia,
+                    label=category,
+                    is_training=is_training,
+                )
+            )
         return result
