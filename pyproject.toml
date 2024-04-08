@@ -7,9 +7,6 @@ license = "MIT"
 readme = "README.md"
 packages = [{include = "pneumonia_dnn"}]
 
-[tool.poetry.scripts]
-pdnn = "pneumonia_dnn.cli.main:app"
-
 [tool.poetry.dependencies]
 python = ">=3.10,<3.12"
 typer = {extras = ["all"], version = "^0.9.0"}
