@@ -161,3 +161,34 @@ def get_project_datasets(
     test_dataset = test_dataset.prefetch(buffer_size=tf.data.AUTOTUNE)  # type: ignore
 
     return train_dataset, test_dataset
+
+
+def save_train_session(
+    model_type: str,
+    run_name: str,
+    project_name: str,
+    model: Any,
+    history: Dict[Any, Any],
+    parameters: Dict[str, Any],
+    projects_path: str = "projects",
+) -> None:
+    """
+    Saves a training session
+
+    Args:
+        run_name: Name of the run
+        project_name: Name of the project
+        model: NN Model
+        projects_path: Path to projects. Defaults to "projects".
+    """
+    save_path = f"{projects_path}/{project_name}/train_sessions/{model_type}/{run_name}"
+    os.makedirs(save_path, exist_ok=True)
+    model.save(f"{save_path}/model.keras")
+
+    with open(
+        f"{save_path}/parameters.json", mode="w", encoding="utf-8"
+    ) as parameters_file:
+        json.dump(parameters, parameters_file)
+
+    with open(f"{save_path}/history.json", mode="w", encoding="utf-8") as history_file:
+        json.dump(history, history_file)

@@ -2,6 +2,8 @@
 Convolutional Neural Network
 """
 
+import time
+
 from typing import Any, List, Tuple
 
 import tensorflow as tf
@@ -14,6 +16,7 @@ from pneumonia_dnn.utils import (
     get_augmented_inputs,
     get_project_configuration,
     get_project_datasets,
+    save_train_session,
 )
 
 
@@ -91,6 +94,9 @@ def run_cnn(
     cnn_neurons: List[int] = [16, 32, 64, 128],
     dropout_rate: float = 0.3,
     dense_layer_neurons: int = 512,
+    learning_rate: float = 0.0001,
+    epochs: int = 25,
+    batch_size: int = 32,
     projects_path: str = "projects",
 ) -> Any:
     """
@@ -104,10 +110,13 @@ def run_cnn(
         cnn_neurons: Number of neurons at each cnn layer
         dropout_rate: Dropout rate
         dense_layer_neurons: Number of neurons at the fully connected dense layer
+        learning_rate: Learning rate of loss function
+        epochs: Number of epochs
+        batch_size: Batch size
         projects_path: Projects Path. Defaults to "projects".
 
     Returns:
-        CNN Model
+        CNN Train Session Results
     """
     train_dataset, test_dataset = get_project_datasets(project_name, projects_path)
 
@@ -123,14 +132,37 @@ def run_cnn(
     )
 
     model.compile(
-        optimizer=RMSprop(learning_rate=0.0001),
+        optimizer=RMSprop(learning_rate=learning_rate),
         loss="binary_crossentropy",
         metrics=["binary_accuracy"],
     )
 
-    return model.fit(
+    history = model.fit(
         train_dataset,
         validation_data=test_dataset,
-        epochs=25,
+        epochs=epochs,
         verbose="binary_accuracy",
+        batch_size=batch_size,
     )
+
+    save_train_session(
+        "cnn",
+        time.strftime("%Y-%m-%dT%H%M%S"),
+        project_name,
+        model,
+        history.history,
+        {
+            "kernel_size": kernel_size,
+            "pooling_size": pooling_size,
+            "pooling_stride": pooling_stride,
+            "cnn_neurons": cnn_neurons,
+            "dropout_rate": dropout_rate,
+            "dense_layer_neurons": dense_layer_neurons,
+            "learning_rate": learning_rate,
+            "epochs": epochs,
+            "batch_size": batch_size,
+        },
+        projects_path,
+    )
+
+    return history

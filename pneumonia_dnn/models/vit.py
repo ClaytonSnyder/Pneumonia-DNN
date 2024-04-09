@@ -1,4 +1,5 @@
 import os
+import time
 
 from typing import Any
 
@@ -14,6 +15,7 @@ from pneumonia_dnn.utils import (
     get_augmented_inputs,
     get_project_configuration,
     get_project_datasets,
+    save_train_session,
 )
 
 
@@ -166,11 +168,13 @@ def __create_model(
 
 def run_vit(
     project_name: str,
-    batch_size: int = 32,
     patch_size: int = 6,
     projection_dim: int = 32,
     num_heads: int = 2,
     transformer_layers: int = 3,
+    learning_rate: float = 0.0001,
+    epochs: int = 25,
+    batch_size: int = 32,
     projects_path: str = "projects",
 ) -> Any:
     """
@@ -183,10 +187,13 @@ def run_vit(
         projection_dim: _description_. Defaults to 32.
         num_heads: _description_. Defaults to 2.
         transformer_layers: _description_. Defaults to 3.
+        learning_rate: Learning rate of loss function
+        epochs: Number of epochs
+        batch_size: Batch size
         projects_path: _description_. Defaults to "projects".
 
     Returns:
-        _description_
+        VIT Train Session Results
     """
     keras.mixed_precision.set_global_policy("mixed_float16")
     train_dataset, test_dataset = get_project_datasets(project_name, projects_path)
@@ -207,6 +214,29 @@ def run_vit(
         metrics=["binary_accuracy"],
     )
 
-    return model.fit(
-        train_dataset, validation_data=test_dataset, epochs=25, batch_size=batch_size
+    history = model.fit(
+        train_dataset,
+        validation_data=test_dataset,
+        epochs=epochs,
+        batch_size=batch_size,
     )
+
+    save_train_session(
+        "vit",
+        time.strftime("%Y-%m-%dT%H%M%S"),
+        project_name,
+        model,
+        history.history,
+        {
+            "patch_size": patch_size,
+            "projection_dim": projection_dim,
+            "num_heads": num_heads,
+            "transformer_layers": transformer_layers,
+            "learning_rate": learning_rate,
+            "epochs": epochs,
+            "batch_size": batch_size,
+        },
+        projects_path,
+    )
+
+    return history
