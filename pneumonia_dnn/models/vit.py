@@ -1,15 +1,15 @@
-import os
+"""
+Vision Transformer Implementation
+"""
+
 import time
 
 from typing import Any
 
 import keras
-import matplotlib.pyplot as plt
-import numpy as np
 import tensorflow as tf
 
 from keras import layers
-from keras.utils import image_dataset_from_directory
 
 from pneumonia_dnn.utils import (
     get_augmented_inputs,
@@ -20,6 +20,17 @@ from pneumonia_dnn.utils import (
 
 
 def create_multilayer_perceptron(x, hidden_units, dropout_rate):
+    """
+    Creates multi-layer perceptron
+
+    Args:
+        x: Input layer
+        hidden_units: Hidden Units
+        dropout_rate: Dropout Rate
+
+    Returns:
+        Multi-Layer perceptron
+    """
     for units in hidden_units:
         x = layers.Dense(units, activation=keras.activations.gelu)(x)
         x = layers.Dropout(dropout_rate)(x)
@@ -91,7 +102,7 @@ class PatchEncoder(layers.Layer):
         return config
 
 
-def __create_model(
+def create_model(
     project_name: str,
     batch_size: int,
     patch_size: int,
@@ -198,7 +209,7 @@ def run_vit(
     keras.mixed_precision.set_global_policy("mixed_float16")
     train_dataset, test_dataset = get_project_datasets(project_name, projects_path)
 
-    model = __create_model(
+    model = create_model(
         project_name,
         batch_size,
         patch_size,

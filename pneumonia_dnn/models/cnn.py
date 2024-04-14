@@ -6,11 +6,8 @@ import time
 
 from typing import Any, List, Tuple
 
-import tensorflow as tf
-
-from keras import Input, Model, layers, models
+from keras import Input, Model, layers
 from keras.optimizers import RMSprop
-from keras.preprocessing.image import ImageDataGenerator
 
 from pneumonia_dnn.utils import (
     get_augmented_inputs,
@@ -20,7 +17,7 @@ from pneumonia_dnn.utils import (
 )
 
 
-def __create_model(
+def create_model(
     project_name: str,
     kernel_size: Tuple[int, int],
     max_pooling_size: int,
@@ -120,7 +117,7 @@ def run_cnn(
     """
     train_dataset, test_dataset = get_project_datasets(project_name, projects_path)
 
-    model = __create_model(
+    model = create_model(
         project_name,
         kernel_size,
         pooling_size,

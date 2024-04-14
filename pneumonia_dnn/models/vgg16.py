@@ -124,7 +124,7 @@ def run_vgg16(
     )
 
     save_train_session(
-        "cnn",
+        "vgg16",
         time.strftime("%Y-%m-%dT%H%M%S"),
         project_name,
         model,

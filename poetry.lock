@@ -105,6 +105,17 @@ webencodings = "*"
 css = ["tinycss2 (>=1.1.0,<1.3)"]
 
 [[package]]
+name = "blinker"
+version = "1.7.0"
+description = "Fast, simple object-to-object and broadcast signaling"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "blinker-1.7.0-py3-none-any.whl", hash = "sha256:c3f865d4d54db7abc53758a01601cf343fe55b84c1de4e3fa910e420b438d5b9"},
+    {file = "blinker-1.7.0.tar.gz", hash = "sha256:e6820ff6fa4e4d1d8e2747c2283749c3f547e4fee112b98555cdcdae32996182"},
+]
+
+[[package]]
 name = "cachetools"
 version = "5.3.3"
 description = "Extensible memoizing collections and decorators"
@@ -275,6 +286,28 @@ files = [
     {file = "einops-0.7.0-py3-none-any.whl", hash = "sha256:0f3096f26b914f465f6ff3c66f5478f9a5e380bb367ffc6493a68143fbbf1fd1"},
     {file = "einops-0.7.0.tar.gz", hash = "sha256:b2b04ad6081a3b227080c9bf5e3ace7160357ff03043cd66cc5b2319eb7031d1"},
 ]
+
+[[package]]
+name = "flask"
+version = "3.0.3"
+description = "A simple framework for building complex web applications."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "flask-3.0.3-py3-none-any.whl", hash = "sha256:34e815dfaa43340d1d15a5c3a02b8476004037eb4840b34910c6e21679d288f3"},
+    {file = "flask-3.0.3.tar.gz", hash = "sha256:ceb27b0af3823ea2737928a4d99d125a06175b8512c445cbd9a9ce200ef76842"},
+]
+
+[package.dependencies]
+blinker = ">=1.6.2"
+click = ">=8.1.3"
+itsdangerous = ">=2.1.2"
+Jinja2 = ">=3.1.2"
+Werkzeug = ">=3.0.0"
+
+[package.extras]
+async = ["asgiref (>=3.2)"]
+dotenv = ["python-dotenv"]
 
 [[package]]
 name = "flatbuffers"
@@ -481,6 +514,34 @@ files = [
 
 [package.extras]
 colors = ["colorama (>=0.4.6)"]
+
+[[package]]
+name = "itsdangerous"
+version = "2.1.2"
+description = "Safely pass data to untrusted environments and back."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "itsdangerous-2.1.2-py3-none-any.whl", hash = "sha256:2c2349112351b88699d8d4b6b075022c0808887cb7ad10069318a8b0bc88db44"},
+    {file = "itsdangerous-2.1.2.tar.gz", hash = "sha256:5dbbc68b317e5e42f327f9021763545dc3fc3bfe22e6deb96aaf1fc38874156a"},
+]
+
+[[package]]
+name = "jinja2"
+version = "3.1.3"
+description = "A very fast and expressive template engine."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "Jinja2-3.1.3-py3-none-any.whl", hash = "sha256:7d6d50dd97d52cbc355597bd845fabfbac3f551e1f99619e39a35ce8c370b5fa"},
+    {file = "Jinja2-3.1.3.tar.gz", hash = "sha256:ac8bd6544d4bb2c9792bf3a159e80bba8fda7f07e81bc3aed565432d5925ba90"},
+]
+
+[package.dependencies]
+MarkupSafe = ">=2.0"
+
+[package.extras]
+i18n = ["Babel (>=2.7)"]
 
 [[package]]
 name = "kaggle"
@@ -1384,6 +1445,33 @@ wrapt = ">=1.11.0,<1.15"
 and-cuda = ["nvidia-cublas-cu12 (==12.2.5.6)", "nvidia-cuda-cupti-cu12 (==12.2.142)", "nvidia-cuda-nvcc-cu12 (==12.2.140)", "nvidia-cuda-nvrtc-cu12 (==12.2.140)", "nvidia-cuda-runtime-cu12 (==12.2.140)", "nvidia-cudnn-cu12 (==8.9.4.25)", "nvidia-cufft-cu12 (==11.0.8.103)", "nvidia-curand-cu12 (==10.3.3.141)", "nvidia-cusolver-cu12 (==11.5.2.141)", "nvidia-cusparse-cu12 (==12.1.2.141)", "nvidia-nccl-cu12 (==2.16.5)", "nvidia-nvjitlink-cu12 (==12.2.140)", "tensorrt (==8.6.1.post1)", "tensorrt-bindings (==8.6.1)", "tensorrt-libs (==8.6.1)"]
 
 [[package]]
+name = "tensorflow-addons"
+version = "0.23.0"
+description = "TensorFlow Addons."
+optional = false
+python-versions = "*"
+files = [
+    {file = "tensorflow_addons-0.23.0-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:28f13271ccb128406859b5cac5219ce3112f3ac84f587c2ba59491d6cbdce96b"},
+    {file = "tensorflow_addons-0.23.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:08b047bd01c0755a4b99d848701853875c42ea6c8c380bcd276195da325abca1"},
+    {file = "tensorflow_addons-0.23.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:0d224e237c11a0185fe1ea5d72e52c9d183a3adc075b4684d904f9b80b4c2579"},
+    {file = "tensorflow_addons-0.23.0-cp311-cp311-macosx_10_14_x86_64.whl", hash = "sha256:ec90069e59628e48e49bcf7f512480b920a3dcc5cebcdf3b08c6a8c050e93176"},
+    {file = "tensorflow_addons-0.23.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:8c22e575fa7479df7137a8f0bb868762889da9687542549314b6683741f367a3"},
+    {file = "tensorflow_addons-0.23.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:591b1c38cfe170727746a60983157ecbdef6a7062dfea8988558e1ab885b513a"},
+    {file = "tensorflow_addons-0.23.0-cp39-cp39-macosx_10_14_x86_64.whl", hash = "sha256:80fd9f129692d8f362fc7b58865799b1262fd179cd4ecc43f138cc719354204f"},
+    {file = "tensorflow_addons-0.23.0-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:032fd58e47aadfcbfc77e30907d08bb41bcc2d17ed90e7fe7cb88a751ef6dda0"},
+    {file = "tensorflow_addons-0.23.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:56f770f7989bf64715dd6e53b23cc2c0ffd91df8d9ee700bb24b3bb1e0b2ea02"},
+]
+
+[package.dependencies]
+packaging = "*"
+typeguard = ">=2.7,<3.0.0"
+
+[package.extras]
+tensorflow = ["tensorflow (>=2.13.0,<2.16.0)"]
+tensorflow-cpu = ["tensorflow-cpu (>=2.13.0,<2.16.0)"]
+tensorflow-gpu = ["tensorflow-gpu (>=2.13.0,<2.16.0)"]
+
+[[package]]
 name = "tensorflow-estimator"
 version = "2.15.0"
 description = "TensorFlow Estimator."
@@ -1490,6 +1578,21 @@ slack = ["slack-sdk"]
 telegram = ["requests"]
 
 [[package]]
+name = "typeguard"
+version = "2.13.3"
+description = "Run-time type checker for Python"
+optional = false
+python-versions = ">=3.5.3"
+files = [
+    {file = "typeguard-2.13.3-py3-none-any.whl", hash = "sha256:5e3e3be01e887e7eafae5af63d1f36c849aaa94e3a0112097312aabfa16284f1"},
+    {file = "typeguard-2.13.3.tar.gz", hash = "sha256:00edaa8da3a133674796cf5ea87d9f4b4c367d77476e185e80251cc13dfbb8c4"},
+]
+
+[package.extras]
+doc = ["sphinx-autodoc-typehints (>=1.2.0)", "sphinx-rtd-theme"]
+test = ["mypy", "pytest", "typing-extensions"]
+
+[[package]]
 name = "typer"
 version = "0.9.0"
 description = "Typer, build great CLIs. Easy to code. Based on Python type hints."
@@ -1551,6 +1654,31 @@ brotli = ["brotli (>=1.0.9)", "brotlicffi (>=0.8.0)"]
 h2 = ["h2 (>=4,<5)"]
 socks = ["pysocks (>=1.5.6,!=1.5.7,<2.0)"]
 zstd = ["zstandard (>=0.18.0)"]
+
+[[package]]
+name = "validators"
+version = "0.28.0"
+description = "Python Data Validation for Humans™"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "validators-0.28.0-py3-none-any.whl", hash = "sha256:e0184691dea3ba82b52c161ba81d3ec1d8be8da9609f0137d1430b395b366521"},
+    {file = "validators-0.28.0.tar.gz", hash = "sha256:85bc82511f6ccd0800f4c15d8c0dc546c15e369640c5ea1f24349ba0b3b17815"},
+]
+
+[[package]]
+name = "vit-keras"
+version = "0.1.2"
+description = "Keras implementation of ViT (Vision Transformer)"
+optional = false
+python-versions = ">=3.7,<3.12"
+files = [
+    {file = "vit_keras-0.1.2-py3-none-any.whl", hash = "sha256:cf24fae8b5fac59646d6d899ca0c57b5a7daa9027f6d7f58d7cdd4443e86e9e8"},
+]
+
+[package.dependencies]
+scipy = "*"
+validators = "*"
 
 [[package]]
 name = "webencodings"
@@ -1680,4 +1808,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "31d42a8e484cb5f1350d6e2461ff2688afed493de55da57cc6cb35bdcf7fa901"
+content-hash = "4bd1fc9a16cc235d8d42a0ff0cf5098b7f309953912ba09ca7ece068aebd651e"
