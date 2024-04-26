@@ -8,6 +8,7 @@ import os
 from typing import Any, Dict, Optional, Tuple
 
 import keras
+import numpy as np
 import tensorflow as tf
 
 from keras import layers
@@ -24,6 +25,37 @@ class DataAugmentationError(Exception):
 
     def __init__(self, message):
         super().__init__(message)
+
+
+def get_labels_and_predictions(
+    dataset: Any, model: Any, batch_size: int, num_classes: int
+):
+    all_predictions = []
+    all_labels = []
+
+    for images, labels in dataset:
+        if num_classes > 2:
+            preds = model.predict(images, batch_size=batch_size)
+            preds = np.argmax(preds, axis=1)
+            all_predictions.extend(preds)
+            labels_oneshot = np.argmax(labels.numpy(), axis=1)
+            all_labels.extend(labels_oneshot)
+        else:
+            preds = model.predict(images, batch_size=batch_size)
+            preds = [x for i in preds for x in i]
+            pred_one_shots = []
+
+            for pred in preds:
+                if pred > 0.5:
+                    pred_one_shots.append(1)
+                else:
+                    pred_one_shots.append(0)
+
+            flattented_labels = [x for i in labels.numpy() for x in i]
+            all_labels.extend(flattented_labels)
+            all_predictions.extend(pred_one_shots)
+
+    return np.array(all_labels), np.array(all_predictions)
 
 
 def get_project_configuration(
@@ -146,6 +178,7 @@ def get_project_datasets(
         train_data_path,
         seed=seed,
         image_size=(height, width),
+        shuffle=True,
         label_mode=label_mode,
     )
     train_dataset = train_dataset.prefetch(buffer_size=tf.data.AUTOTUNE)  # type: ignore

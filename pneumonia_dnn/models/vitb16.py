@@ -8,10 +8,13 @@ import numpy as np
 import tensorflow as tf
 
 from keras import Input, layers
+from keras.optimizers import Adam, RMSprop
+from sklearn.metrics import confusion_matrix
 from vit_keras import vit
 
 from pneumonia_dnn.utils import (
     get_augmented_inputs,
+    get_labels_and_predictions,
     get_project_configuration,
     get_project_datasets,
     save_train_session,
@@ -62,7 +65,7 @@ def create_model(
 
     # Create the Keras model.
     model = keras.Model(inputs=inputs, outputs=logits)
-    return model
+    return model, num_classes
 
 
 def run_vitb16(
@@ -75,6 +78,7 @@ def run_vitb16(
     learning_rate: float = 0.0001,
     epochs: int = 25,
     batch_size: int = 32,
+    use_adam_optimizer: bool = True,
     projects_path: str = "projects",
 ) -> Any:
     """
@@ -98,7 +102,7 @@ def run_vitb16(
     keras.mixed_precision.set_global_policy("mixed_float16")
     train_dataset, test_dataset = get_project_datasets(project_name, projects_path)
 
-    model = create_model(
+    model, num_classes = create_model(
         project_name,
         activation,
         pretrained,
@@ -108,10 +112,22 @@ def run_vitb16(
         projects_path,
     )
 
+    if num_classes > 2:
+        loss_function = "categorical_crossentropy"
+        metric = "accuracy"
+    else:
+        loss_function = "binary_crossentropy"
+        metric = "binary_accuracy"
+
+    if use_adam_optimizer:
+        optimizer = Adam(learning_rate=learning_rate)
+    else:
+        optimizer = RMSprop(learning_rate=learning_rate)
+
     model.compile(
-        optimizer="adam",
-        loss="binary_crossentropy",
-        metrics=["binary_accuracy"],
+        optimizer=optimizer,
+        loss=loss_function,
+        metrics=[metric],
     )
 
     history = model.fit(
@@ -121,6 +137,13 @@ def run_vitb16(
         batch_size=batch_size,
     )
 
+    true_labels, predictions = get_labels_and_predictions(
+        test_dataset, model, batch_size, num_classes
+    )
+
+    cm = confusion_matrix(true_labels, predictions)
+
+    loss, accuracy = model.evaluate(test_dataset)
     save_train_session(
         "vitb16",
         time.strftime("%Y-%m-%dT%H%M%S"),
@@ -140,4 +163,4 @@ def run_vitb16(
         projects_path,
     )
 
-    return history
+    return model, history, predictions, cm, loss, accuracy

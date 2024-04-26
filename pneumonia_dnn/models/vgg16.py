@@ -8,10 +8,12 @@ from typing import Any
 
 from keras import Input, Model, layers
 from keras.applications.vgg16 import VGG16
-from keras.optimizers import RMSprop
+from keras.optimizers import Adam, RMSprop
+from sklearn.metrics import confusion_matrix
 
 from pneumonia_dnn.utils import (
     get_augmented_inputs,
+    get_labels_and_predictions,
     get_project_configuration,
     get_project_datasets,
     save_train_session,
@@ -68,7 +70,7 @@ def __create_model(
     else:
         dense_layer = layers.Dense(num_classes, activation="softmax")(dense_layer)
 
-    return Model(inputs=inputs, outputs=dense_layer)
+    return Model(inputs=inputs, outputs=dense_layer), num_classes
 
 
 def run_vgg16(
@@ -79,6 +81,7 @@ def run_vgg16(
     learning_rate: float = 0.0001,
     epochs: int = 25,
     batch_size: int = 32,
+    use_adam_optimizer: bool = True,
     projects_path: str = "projects",
 ) -> Any:
     """
@@ -94,6 +97,7 @@ def run_vgg16(
         learning_rate: Learning rate of loss function
         epochs: Number of epochs
         batch_size: Batch size
+        use_adam: If true adam optimizer is used. If false, RMSProp is used
         projects_path: Projects Path. Defaults to "projects".
 
     Returns:
@@ -101,7 +105,7 @@ def run_vgg16(
     """
     train_dataset, test_dataset = get_project_datasets(project_name, projects_path)
 
-    model = __create_model(
+    model, num_classes = __create_model(
         project_name,
         weights,
         include_top,
@@ -109,19 +113,39 @@ def run_vgg16(
         projects_path,
     )
 
+    if num_classes > 2:
+        loss_function = "categorical_crossentropy"
+        metric = "accuracy"
+    else:
+        loss_function = "binary_crossentropy"
+        metric = "binary_accuracy"
+
+    if use_adam_optimizer:
+        optimizer = Adam(learning_rate=learning_rate)
+    else:
+        optimizer = RMSprop(learning_rate=learning_rate)
+
     model.compile(
-        optimizer=RMSprop(learning_rate=learning_rate),
-        loss="binary_crossentropy",
-        metrics=["binary_accuracy"],
+        optimizer=optimizer,
+        loss=loss_function,
+        metrics=[metric],
     )
 
     history = model.fit(
         train_dataset,
         validation_data=test_dataset,
         epochs=epochs,
-        verbose="binary_accuracy",
+        verbose=metric,
         batch_size=batch_size,
     )
+
+    true_labels, predictions = get_labels_and_predictions(
+        test_dataset, model, batch_size, num_classes
+    )
+
+    cm = confusion_matrix(true_labels, predictions)
+
+    loss, accuracy = model.evaluate(test_dataset)
 
     save_train_session(
         "vgg16",
@@ -140,4 +164,4 @@ def run_vgg16(
         projects_path,
     )
 
-    return history
+    return model, history, predictions, cm, loss, accuracy

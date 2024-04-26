@@ -4,8 +4,9 @@ import random
 import shutil
 
 from math import ceil
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
+import cv2
 import numpy as np
 import pandas as pd
 
@@ -35,19 +36,51 @@ def _copy_images(
     project_name: str,
     height: int,
     width: int,
-) -> None:
+    apply_edge_detection: bool,
+    edge_detection_threshold1: int,
+    edge_detection_threshold2: int,
+) -> Tuple[List[str], List[str], List[int], List[int], List[str]]:
     df_list = df.values.tolist()
+
+    files: List[str] = []
+    labels: List[str] = []
+    widths: List[int] = []
+    heights: List[int] = []
+    types: List[str] = []
 
     destination_path = f"{projects_path}/{project_name}/dataset/{path}"
 
     for row in tqdm(df_list, desc=f"Processing {path} for label {label}"):
         file_path = row[1]
         label_str = row[2]
-
+        width = row[3]
+        height = row[4]
+        destination = f"{destination_path}/{label_str}/{os.path.basename(file_path)}"
         os.makedirs(f"{destination_path}/{label_str}/", exist_ok=True)
-        shutil.copyfile(
-            file_path, f"{destination_path}/{label_str}/{os.path.basename(file_path)}"
-        )
+
+        if apply_edge_detection:
+            apply_canny(
+                file_path,
+                destination,
+                edge_detection_threshold1,
+                edge_detection_threshold2,
+            )
+        else:
+            shutil.copyfile(file_path, destination)
+
+        files.append(destination)
+        labels.append(label_str)
+        heights.append(height)
+        widths.append(width)
+        types.append(path)
+
+    return files, labels, heights, widths, types
+
+
+def apply_canny(image_path, save_path, threshold1, threshold2):
+    image = cv2.imread(image_path)
+    edges = cv2.Canny(image, threshold1, threshold2)
+    cv2.imwrite(save_path, edges)
 
 
 def create_project(
@@ -60,9 +93,12 @@ def create_project(
     train_split: float,
     max_images: Optional[int],
     seed: Optional[int],
+    apply_edge_detection: bool = False,
+    edge_detection_threshold1: int = 100,
+    edge_detection_threshold2: int = 200,
     dataset_path: str = "datasets",
     projects_path: str = "projects",
-) -> None:
+) -> Dict[Any, Any]:
     """
     Creates a project
 
@@ -98,6 +134,12 @@ def create_project(
     num_of_train: int = ceil(max_images * train_split)
     num_of_test: int = max_images - num_of_train
 
+    all_files = []
+    all_labels = []
+    all_heights = []
+    all_widths = []
+    all_types = []
+
     for label in labels:
         label_images_lookup[label] = metadata_df[metadata_df["label"] == label]
 
@@ -119,16 +161,56 @@ def create_project(
         train_data = label_images_lookup[label].sample(
             train_label_image_count_lookup[label]
         )
-        _copy_images(
-            train_data, "train", label, projects_path, name, image_height, image_width
+
+        files, local_labels, heights, widths, types = _copy_images(
+            train_data,
+            "train",
+            label,
+            projects_path,
+            name,
+            image_height,
+            image_width,
+            apply_edge_detection,
+            edge_detection_threshold1,
+            edge_detection_threshold2,
         )
+        all_files.extend(files)
+        all_labels.extend(local_labels)
+        all_heights.extend(heights)
+        all_widths.extend(widths)
+        all_types.extend(types)
 
         test_data = label_images_lookup[label].sample(
             test_label_image_count_lookup[label]
         )
-        _copy_images(
-            test_data, "test", label, projects_path, name, image_height, image_width
+        files, local_labels, heights, widths, types = _copy_images(
+            test_data,
+            "test",
+            label,
+            projects_path,
+            name,
+            image_height,
+            image_width,
+            apply_edge_detection,
+            edge_detection_threshold1,
+            edge_detection_threshold2,
         )
+        all_files.extend(files)
+        all_labels.extend(local_labels)
+        all_heights.extend(heights)
+        all_widths.extend(widths)
+        all_types.extend(types)
+
+    dataset_df = pd.DataFrame(
+        {
+            "file": all_files,
+            "label": all_labels,
+            "type": all_types,
+            "width": all_widths,
+            "height": all_heights,
+        }
+    )
+    dataset_df.to_csv(f"{projects_path}/{name}/dataset/__metadata.csv")
 
     project_data = {
         "name": name,
@@ -148,6 +230,8 @@ def create_project(
 
     with open(f"{projects_path}/{name}/project.json", "w", encoding="utf-8") as fout:
         json.dump(project_data, fout)
+
+    return project_data
 
 
 def apply_augmentations(
@@ -196,3 +280,17 @@ def apply_augmentations(
         f"{projects_path}/{project_name}/project.json", "w", encoding="utf-8"
     ) as fout:
         json.dump(project_data, fout)
+
+
+def get_projects(projects_path: str = "projects"):
+    project_folders = os.listdir(projects_path)
+
+    projects = []
+
+    for set_path in project_folders:
+        properties_path = f"{projects_path}/{set_path}/project.json"
+        with open(properties_path, "r", encoding="utf-8") as properties_file:
+            project_properties = json.load(properties_file)
+            projects.append(project_properties)
+
+    return {"projects": projects}

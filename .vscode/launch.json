@@ -10,6 +10,17 @@
       "request": "launch",
       "module": "pneumonia_dnn",
       "args": ["project", "vit", "my_first_project"]
+    },
+    {
+      "name": "Flask",
+      "type": "debugpy",
+      "request": "launch",
+      "stopOnEntry": false,
+      "program": "${workspaceRoot}/pneumonia_dnn/server.py",
+      "env": {
+        "FLASK_APP": "${workspaceRoot}/pneumonia_dnn/server.py"
+      },
+      "args": ["run"]
     }
   ]
 }

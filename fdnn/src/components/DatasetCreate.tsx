@@ -6,13 +6,16 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import type { DialogProps } from "@mui/material";
+import { IDataset } from "./DatasetPage";
+import { useNavigate } from "react-router-dom";
 
 export interface IDatasetCreateProps {
-    refreshDatasets: () => void;
+    refreshDatasets: (callback?: () => void) => void;
 }
 
 export function DatasetCreate(props: IDatasetCreateProps) {
     const [open, setOpen] = React.useState(false);
+    const navigate = useNavigate();
 
     const handleClose: DialogProps["onClose"] = (_event, reason) => {
         if (reason && reason === "backdropClick") return;
@@ -39,8 +42,10 @@ export function DatasetCreate(props: IDatasetCreateProps) {
             .then(function (res) {
                 return res.json();
             })
-            .then(function () {
-                props.refreshDatasets();
+            .then(function (response: IDataset) {
+                props.refreshDatasets(() => {
+                    navigate(`/datasets/${encodeURI(response.name)}`);
+                });
                 setOpen(false);
             });
     };

@@ -37,7 +37,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={<Layout />}>
                         <Route path="/" element={<DatasetPage />} />
-                        <Route path="/datasets" element={<DatasetPage />} />
+                        <Route path="/datasets/*" element={<DatasetPage />} />
                         <Route path="/projects" element={<ProjectsPage />} />
                     </Route>
                 </Routes>
