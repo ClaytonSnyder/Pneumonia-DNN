@@ -3,3 +3,4 @@ datasets/
 projects/
 dist/
 **/__pycache__/
+downloads/

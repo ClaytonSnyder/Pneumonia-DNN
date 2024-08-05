@@ -98,16 +98,7 @@
     ```bash
     poetry build
     source .venv/Scripts/activate
-    pdnn datasets download
     ```
 
-1. Wait for all files to be downloaded
-1. Running the following will create a dataset comprised of images from all configured datasets
-
-    ```bash
-    poetry build
-    source .venv/Scripts/activate
-    pdnn project create my_first_project
-    pdnn project resize my_first_project 500 500
-    pdnn project cnn my_first_project
-    ```
+1. Click "exprirements.ipynb"
+1. Click "Run All"
